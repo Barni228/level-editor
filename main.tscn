@@ -1,0 +1,127 @@
+[gd_scene format=3 uid="uid://cgn51rsbnfdl6"]
+
+[ext_resource type="TileSet" uid="uid://dubx82d031gqx" path="res://tile_set.tres" id="1_0xm2m"]
+[ext_resource type="Texture2D" uid="uid://p6mng24dta78" path="res://assets/Tilemap.png" id="2_lquwl"]
+[ext_resource type="Texture2D" uid="uid://dyog3yq0c3ji4" path="res://assets/SelectionIndicator.png" id="3_h2yge"]
+[ext_resource type="Script" uid="uid://cuc0joc44qcdu" path="res://selector.gd" id="4_1bvp3"]
+[ext_resource type="Script" uid="uid://c7slw27jttoyw" path="res://dual_tile_map_layer.gd" id="4_lquwl"]
+[ext_resource type="Texture2D" uid="uid://i5bu0n3rlbfk" path="res://icon.svg" id="6_7mycd"]
+
+[sub_resource type="TileSetAtlasSource" id="TileSetAtlasSource_7mycd"]
+texture = ExtResource("2_lquwl")
+0:0/0 = 0
+0:0/0/terrain_set = 0
+0:0/0/terrain = 0
+0:0/0/terrains_peering_bit/bottom_left_corner = 0
+1:0/0 = 0
+1:0/0/terrain_set = 0
+1:0/0/terrain = 0
+1:0/0/terrains_peering_bit/bottom_right_corner = 0
+1:0/0/terrains_peering_bit/top_right_corner = 0
+2:0/0 = 0
+2:0/0/terrain_set = 0
+2:0/0/terrain = 0
+2:0/0/terrains_peering_bit/bottom_right_corner = 0
+2:0/0/terrains_peering_bit/bottom_left_corner = 0
+2:0/0/terrains_peering_bit/top_left_corner = 0
+3:0/0 = 0
+3:0/0/terrain_set = 0
+3:0/0/terrain = 0
+3:0/0/terrains_peering_bit/bottom_right_corner = 0
+3:0/0/terrains_peering_bit/bottom_left_corner = 0
+3:1/0 = 0
+3:1/0/terrain_set = 0
+3:1/0/terrain = 0
+3:1/0/terrains_peering_bit/bottom_left_corner = 0
+3:1/0/terrains_peering_bit/top_left_corner = 0
+3:1/0/terrains_peering_bit/top_right_corner = 0
+3:2/0 = 0
+3:2/0/terrain_set = 0
+3:2/0/terrain = 0
+3:2/0/terrains_peering_bit/bottom_left_corner = 0
+3:2/0/terrains_peering_bit/top_left_corner = 0
+3:3/0 = 0
+3:3/0/terrain_set = 0
+3:3/0/terrain = 0
+3:3/0/terrains_peering_bit/top_left_corner = 0
+2:3/0 = 0
+2:3/0/terrain_set = 0
+2:3/0/terrain = 0
+2:3/0/terrains_peering_bit/bottom_left_corner = 0
+2:3/0/terrains_peering_bit/top_right_corner = 0
+1:3/0 = 0
+1:3/0/terrain_set = 0
+1:3/0/terrain = 0
+1:3/0/terrains_peering_bit/bottom_right_corner = 0
+0:3/0 = 0
+0:3/0/terrain_set = 0
+0:3/0/terrain = 0
+0:2/0 = 0
+0:2/0/terrain_set = 0
+0:2/0/terrain = 0
+0:2/0/terrains_peering_bit/top_right_corner = 0
+0:1/0 = 0
+0:1/0/terrain_set = 0
+0:1/0/terrain = 0
+0:1/0/terrains_peering_bit/bottom_right_corner = 0
+0:1/0/terrains_peering_bit/top_left_corner = 0
+1:1/0 = 0
+1:1/0/terrain_set = 0
+1:1/0/terrain = 0
+1:1/0/terrains_peering_bit/bottom_right_corner = 0
+1:1/0/terrains_peering_bit/bottom_left_corner = 0
+1:1/0/terrains_peering_bit/top_right_corner = 0
+2:1/0 = 0
+2:1/0/terrain_set = 0
+2:1/0/terrain = 0
+2:1/0/terrains_peering_bit/bottom_right_corner = 0
+2:1/0/terrains_peering_bit/bottom_left_corner = 0
+2:1/0/terrains_peering_bit/top_left_corner = 0
+2:1/0/terrains_peering_bit/top_right_corner = 0
+2:2/0 = 0
+2:2/0/terrain_set = 0
+2:2/0/terrain = 0
+2:2/0/terrains_peering_bit/bottom_right_corner = 0
+2:2/0/terrains_peering_bit/top_left_corner = 0
+2:2/0/terrains_peering_bit/top_right_corner = 0
+1:2/0 = 0
+1:2/0/terrain_set = 0
+1:2/0/terrain = 0
+1:2/0/terrains_peering_bit/top_left_corner = 0
+1:2/0/terrains_peering_bit/top_right_corner = 0
+
+[sub_resource type="TileSet" id="TileSet_272bh"]
+terrain_set_0/mode = 1
+terrain_set_0/terrain_0/name = "grass-dirt"
+terrain_set_0/terrain_0/color = Color(0.7647059, 0.74509805, 0.41568628, 1)
+terrain_set_0/terrain_1/name = "water-dirt"
+terrain_set_0/terrain_1/color = Color(0.5294118, 0.59607846, 0.6666667, 1)
+terrain_set_0/terrain_2/name = "water-grass"
+terrain_set_0/terrain_2/color = Color(0.46875, 0.5, 0.25, 1)
+sources/0 = SubResource("TileSetAtlasSource_7mycd")
+
+[node name="Main" type="Node2D" unique_id=573929827]
+
+[node name="TileMapLayer" type="TileMapLayer" parent="." unique_id=1011233617]
+tile_set = ExtResource("1_0xm2m")
+
+[node name="Temp" type="Node2D" parent="." unique_id=1589403827]
+
+[node name="DualTileMapLayer" type="TileMapLayer" parent="." unique_id=904267398]
+tile_set = SubResource("TileSet_272bh")
+script = ExtResource("4_lquwl")
+metadata/_custom_type_script = "uid://c7slw27jttoyw"
+
+[node name="Camera2D" type="Camera2D" parent="." unique_id=749953210]
+zoom = Vector2(4, 4)
+
+[node name="Selector" type="Sprite2D" parent="." unique_id=1388221377 node_paths=PackedStringArray("dual_tile_map")]
+texture = ExtResource("3_h2yge")
+hframes = 2
+script = ExtResource("4_1bvp3")
+dual_tile_map = NodePath("../DualTileMapLayer")
+
+[node name="Icon" type="Sprite2D" parent="." unique_id=1562459550]
+position = Vector2(56, 0)
+scale = Vector2(0.12500001, 0.125)
+texture = ExtResource("6_7mycd")
