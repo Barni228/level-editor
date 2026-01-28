@@ -3,7 +3,8 @@ class_name DualTileMapLayer extends TileMapLayer
 # currently this only supports 1 terrain set (0)
 ## map that maps Array of 4 [int] to atlas tile position (Vector2i)
 ## key: [0] = top left, [1] = top right, [2] = bottom left, [3] = bottom right
-## value: -1 = empty, 0 = grass
+## the int values are: -1 = empty, 0 = not empty
+## value: tile atlas position
 var terrain_to_tile: Dictionary[Array, Vector2i] = {}
 
 ## which tile set atlas to use
@@ -75,7 +76,7 @@ func format_tile(dual_pos: Vector2i) -> Vector2i:
 	return terrain_to_tile[key]
 
 
-## takes a tile position, returns 4 corner positions
+## takes a real tile map position and returns 4 corresponding dual tile map positions
 func pos_to_dual(pos: Vector2i) -> Array[Vector2i]:
 	# Note: pos is bottom right tile in the dual tile map
 	return [
@@ -85,6 +86,7 @@ func pos_to_dual(pos: Vector2i) -> Array[Vector2i]:
 		pos - Vector2i(0, 0), # bottom right
 	]
 
+## takes a dual tile map position and returns 4 corresponding real tile map positions
 func dual_to_pos(dual_pos: Vector2i) -> Array[Vector2i]:
 	# Note: dual_pos is top left in the real tile map
 	return [
