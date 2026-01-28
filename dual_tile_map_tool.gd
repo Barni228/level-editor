@@ -2,9 +2,6 @@
 class_name DualTileMapTool extends TileMapLayer
 
 
-const TILE_EMPTY := [-1, -1, -1, -1]
-# const TILE_EMPTY := [-1, -1, -1, -1]
-
 ## how often this should update when in the editor
 ## it has no affect on the actual running game, just the editor
 @export var update_interval := 0.1
@@ -44,8 +41,6 @@ var _update_timer := 0.0
 
 func _ready() -> void:
 	_generate_terrain_to_tile()
-
-	print(terrain_to_tile[[-1, -1, -1, -1]])
 
 	# create the offset tilemap
 	offset_tilemap = TileMapLayer.new()
