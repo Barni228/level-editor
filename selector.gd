@@ -6,11 +6,12 @@ var rect_mode := false
 var rect_start: Vector2i
 
 ## if [member keep_empty] is true, this will NOT remove empty tiles (so it never removes anything from the dual grid, just updates it)
-## see [method DualTileMapLayer.remove_tile]
+## see [method DualTileMapTool.add_empty_tile]
 @export var keep_empty := false
 
 # @export var tilemap: TileMapLayer
-@export var dual_tile_map: DualTileMapLayer
+# @export var dual_tile_map: DualTileMapLayer
+@export var dual_tile_map: DualTileMapTool
 
 
 func _ready() -> void:
@@ -47,7 +48,10 @@ func _process(_delta: float) -> void:
 
 	if Input.is_action_pressed(&"remove_tile"):
 		for grid_pos in selected_tiles():
-			dual_tile_map.remove_tile(grid_pos, keep_empty)
+			if keep_empty:
+				dual_tile_map.add_empty_tile(grid_pos)
+			else:
+				dual_tile_map.remove_tile(grid_pos)
 
 	
 func selected_tiles() -> Array[Vector2i]:
@@ -69,13 +73,14 @@ func selected_tiles() -> Array[Vector2i]:
 		return [mouse_grid_pos()]
 
 func mouse_grid_pos() -> Vector2i:
-	var mouse_pos = get_global_mouse_position()
+	var mouse_pos = get_global_mouse_position() - Vector2(8, 8)
 	var grid_pos: Vector2i = (mouse_pos / 16).round()
 	return grid_pos
 
 
 func _draw() -> void:
-	var sides := [Vector2(-8, -8), Vector2(8, -8), Vector2(8, 8), Vector2(-8, 8)]
+	# var sides := [Vector2(-8, -8), Vector2(8, -8), Vector2(8, 8), Vector2(-8, 8)]
+	var sides := [Vector2(0, 0), Vector2(16, 0), Vector2(16, 16), Vector2(0, 16)]
 
 	if rect_mode:
 		var end = mouse_grid_pos()
