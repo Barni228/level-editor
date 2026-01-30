@@ -1,5 +1,18 @@
 # Level Editor
 
+## Known Issues
+
+if you assign a TileSet resource to `DualTileMapTool`, when you open TileSet Editor on that resource
+it might print a bunch of errors about some mesh:
+
+```
+ERROR: scene/main/canvas_item.cpp:1000 - Required object "rp_mesh" is null.
+```
+
+to fix it, you just need to save the `TileSet` resource as file (Save As...)
+but beware that when this happens, ur `TileSet` will actually break so you will need to create a new one
+so just save it as `.tres` file immediately, and then use this node
+
 ## DualTileMapTool
 
 here is how to use it:

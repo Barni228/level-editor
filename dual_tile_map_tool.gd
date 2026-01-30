@@ -2,6 +2,15 @@
 class_name DualTileMapTool extends TileMapLayer
 
 
+# TODO: instead of using Array[int] as terrain_to_tile key, encode the terrain bits into single int
+
+enum Tile {
+	EMPTY = -1,
+	GRASS = 0,
+	WATER = 1,
+}
+
+
 ## how often this should update when in the editor
 ## it has no affect on the actual running game, just the editor
 @export var update_interval := 0.1
@@ -31,6 +40,8 @@ var terrain_to_tile: Dictionary[Array, Vector2i] = {}
 ## which tile set atlas to use
 var source_id := 0
 var tile_set_index := 0
+
+# currently only 1 terrain set is supported
 var terrain_set := 0
 
 var offset_tilemap: TileMapLayer
@@ -68,28 +79,29 @@ func update_every_tile() -> void:
 
 	for pos in get_used_cells():
 		var tile_data := get_cell_tile_data(pos)
+		# add_tile(pos, tile_data.terrain)
+		# I could create a set that holds which cells should be updated, and then update them from there
+		# to avoid updating the same tile here multiple times, but i feel like updating tiles is cheap enough to not bother
+		# if pos is close to another pos, then they probably share some of the dual tiles, so I update that same dual pos multiple times
+		# for dual_pos in pos_to_dual(pos):
+		# 	format_tile(dual_pos)
 		if tile_data_to_terrain_key(tile_data) == [-1, -1, -1, -1]:
-			add_empty_tile(pos)
+			add_tile(pos, Tile.EMPTY)
+			# add_empty_tile(pos)
 		else:
-			add_tile(pos)
+			add_tile(pos, tile_data.terrain)
+
 
 # func add_tile(pos: Vector2i, terrain_set: int = 0, terrain: int = 0, ignore_empty_terrains: bool = true) -> void:
 ## add a tile at [param pos]
-func add_tile(pos: Vector2i) -> void:
+func add_tile(pos: Vector2i, tile: Tile) -> void:
 	# add a "full" tile to the tile map
-	set_cell(pos, source_id, terrain_to_tile[[0, 0, 0, 0]])
+	# set_cell(pos, source_id, terrain_to_tile[[0, 0, 0, 0]])
+	set_cell(pos, source_id, terrain_to_tile[[tile, tile, tile, tile]])
 
 	for dual_pos in pos_to_dual(pos):
-		offset_tilemap.set_cell(dual_pos, source_id, format_tile(dual_pos))
+		format_tile(dual_pos)
 
-
-func add_empty_tile(pos: Vector2i) -> void:
-	# add a "empty" tile to the tile map
-	set_cell(pos, source_id, terrain_to_tile[[-1, -1, -1, -1]])
-
-	# update the 4 corresponding dual tile map cells
-	for dual_pos in pos_to_dual(pos):
-		offset_tilemap.set_cell(dual_pos, source_id, format_tile(dual_pos))
 
 ## remove the tile at [param pos]
 ## if [param keep_empty] is true, this will NOT remove empty tiles (so it never removes anything from the dual grid, just updates it)
@@ -98,17 +110,21 @@ func remove_tile(pos: Vector2i) -> void:
 
 	# update the 4 corresponding dual tile map cells
 	for dual_pos in pos_to_dual(pos):
-		var formatted_tile: Vector2i = format_tile(dual_pos)
+		var formatted_tile: Vector2i = get_formatted_tile(dual_pos)
 		# if no one is around this tile, remove it
 		if formatted_tile == terrain_to_tile[[-1, -1, -1, -1]]:
 			offset_tilemap.erase_cell(dual_pos)
 		# if there is someone near this tile (who is not current tile, since we removed it), just update it
 		else:
-			offset_tilemap.set_cell(dual_pos, source_id, format_tile(dual_pos))
+			offset_tilemap.set_cell(dual_pos, source_id, get_formatted_tile(dual_pos))
+
+
+func format_tile(dual_pos: Vector2i) -> void:
+	offset_tilemap.set_cell(dual_pos, source_id, get_formatted_tile(dual_pos))
 
 
 ## takes a dual tile map position and returns the formatted atlas tile position
-func format_tile(dual_pos: Vector2i) -> Vector2i:
+func get_formatted_tile(dual_pos: Vector2i) -> Vector2i:
 	var key: Array[int] = []
 
 	# pos is in dual tile map, i format it based on 4 REAL tiles around it (so not dual grid tiles)
@@ -121,6 +137,27 @@ func format_tile(dual_pos: Vector2i) -> Vector2i:
 		else:
 			# cell_data.terrain is 0, usually (it probably represents the middle square when painting terrains in tile set editor)
 			key.append(cell_data.terrain)
+	
+	# if this key does not exist in the terrain data, then find the most common tile (the one that appears the most around us)
+	# and say that everyone is either that tile, or Tile.EMPTY, nothing else (so only 2 choices)
+	# THAT should be in terrain_to_tile, if it isn't then u have broken TileSet 
+	# because dual grid TileSet should have every possible combination for empty or not empty tile
+	if key not in terrain_to_tile:
+		# find the most common element in this array, that is not -1
+		var most_common = key.reduce(func(common, new):
+			if common == -1:
+				return new
+			if new == -1:
+				return common
+			# if both are equal, return the smaller tile ID (so it is consistent)
+			if key.count(common) == key.count(new):
+				return min(common, new)
+			return common if key.count(common) > key.count(new) else new
+		)
+		# print(most_common)
+		for i in key.size():
+			if key[i] != -1:
+				key[i] = most_common
 
 	return terrain_to_tile[key]
 
@@ -156,10 +193,15 @@ func _generate_terrain_to_tile() -> void:
 	var grid_size = tile_source.get_atlas_grid_size()
 	for x in grid_size.x:
 		for y in grid_size.y:
+			# skip non existing tiles (the ones that are disabled)
 			if tile_source.get_tile_at_coords(Vector2i(x, y)) == Vector2i(-1, -1):
 				continue
 
 			var tile_data: TileData = tile_source.get_tile_data(Vector2i(x, y), 0)
+			# check if the tile data has a terrain set
+			if not tile_data.is_valid_terrain_peering_bit(TileSet.CellNeighbor.CELL_NEIGHBOR_TOP_LEFT_CORNER):
+				continue
+
 			var key: Array[int] = tile_data_to_terrain_key(tile_data)
 			terrain_to_tile[key] = Vector2i(x, y)
 

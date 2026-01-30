@@ -20,6 +20,7 @@ func _ready() -> void:
 		set_process(false)
 
 
+# TODO: use TileMap.local_to_map instead of assuming the grid is 16x16
 func _process(_delta: float) -> void:
 	if Input.is_action_just_pressed(&"rect"):
 		rect_mode = !rect_mode
@@ -43,13 +44,13 @@ func _process(_delta: float) -> void:
 
 	if Input.is_action_pressed(&"add_tile"):
 		for grid_pos in selected_tiles():
-			dual_tile_map.add_tile(grid_pos)
+			dual_tile_map.add_tile(grid_pos, dual_tile_map.Tile.GRASS)
 	
 
 	if Input.is_action_pressed(&"remove_tile"):
 		for grid_pos in selected_tiles():
 			if keep_empty:
-				dual_tile_map.add_empty_tile(grid_pos)
+				dual_tile_map.add_tile(grid_pos, dual_tile_map.Tile.EMPTY)
 			else:
 				dual_tile_map.remove_tile(grid_pos)
 
