@@ -2,14 +2,7 @@
 class_name DualTileMapTool extends TileMapLayer
 
 
-# TODO: instead of using Array[int] as terrain_to_tile key, encode the terrain bits into single int
-
-enum Tile {
-	EMPTY = -1,
-	GRASS = 0,
-	WATER = 1,
-}
-
+## TODO: use tile_map_data to check if the tilemap has changed, and only then update
 
 ## how often this should update when in the editor
 ## it has no affect on the actual running game, just the editor
@@ -29,13 +22,11 @@ enum Tile {
 ## Note: when you change this, you need to restart the scene for it to take effect
 var hide_offset_tilemap := true
 
-
-# currently this only supports 1 terrain set (0)
-## map that maps Array of 4 [int] to atlas tile position (Vector2i)
-## key: [0] = top left, [1] = top right, [2] = bottom left, [3] = bottom right
-## the int values are: -1 = empty, 0 = not empty
+## map that maps encoded 4 int to atlas tile position (Vector2i)
+## encoded key: [0] = top left, [1] = top right, [2] = bottom left, [3] = bottom right
+## the numbers in the key are tile IDs (-1 = empty)
 ## value: tile atlas position
-var terrain_to_tile: Dictionary[Array, Vector2i] = {}
+var _terrain_to_tile: Dictionary[int, Vector2i] = {}
 
 ## which tile set atlas to use
 var source_id := 0
@@ -86,7 +77,7 @@ func update_every_tile() -> void:
 		# for dual_pos in pos_to_dual(pos):
 		# 	format_tile(dual_pos)
 		if tile_data_to_terrain_key(tile_data) == [-1, -1, -1, -1]:
-			add_tile(pos, Tile.EMPTY)
+			add_tile(pos, -1)
 			# add_empty_tile(pos)
 		else:
 			add_tile(pos, tile_data.terrain)
@@ -94,10 +85,9 @@ func update_every_tile() -> void:
 
 # func add_tile(pos: Vector2i, terrain_set: int = 0, terrain: int = 0, ignore_empty_terrains: bool = true) -> void:
 ## add a tile at [param pos]
-func add_tile(pos: Vector2i, tile: Tile) -> void:
+func add_tile(pos: Vector2i, tile: int) -> void:
 	# add a "full" tile to the tile map
-	# set_cell(pos, source_id, terrain_to_tile[[0, 0, 0, 0]])
-	set_cell(pos, source_id, terrain_to_tile[[tile, tile, tile, tile]])
+	set_cell(pos, source_id, tile_from_terrain(tile, tile, tile, tile))
 
 	for dual_pos in pos_to_dual(pos):
 		format_tile(dual_pos)
@@ -112,7 +102,7 @@ func remove_tile(pos: Vector2i) -> void:
 	for dual_pos in pos_to_dual(pos):
 		var formatted_tile: Vector2i = get_formatted_tile(dual_pos)
 		# if no one is around this tile, remove it
-		if formatted_tile == terrain_to_tile[[-1, -1, -1, -1]]:
+		if formatted_tile == tile_from_terrain(-1, -1, -1, -1):
 			offset_tilemap.erase_cell(dual_pos)
 		# if there is someone near this tile (who is not current tile, since we removed it), just update it
 		else:
@@ -140,9 +130,9 @@ func get_formatted_tile(dual_pos: Vector2i) -> Vector2i:
 	
 	# if this key does not exist in the terrain data, then find the most common tile (the one that appears the most around us)
 	# and say that everyone is either that tile, or Tile.EMPTY, nothing else (so only 2 choices)
-	# THAT should be in terrain_to_tile, if it isn't then u have broken TileSet 
+	# THAT should be in _terrain_to_tile, if it isn't then u have broken TileSet 
 	# because dual grid TileSet should have every possible combination for empty or not empty tile
-	if key not in terrain_to_tile:
+	if encode_key(key) not in _terrain_to_tile:
 		# find the most common element in this array, that is not -1
 		var most_common = key.reduce(func(common, new):
 			if common == -1:
@@ -159,7 +149,7 @@ func get_formatted_tile(dual_pos: Vector2i) -> Vector2i:
 			if key[i] != -1:
 				key[i] = most_common
 
-	return terrain_to_tile[key]
+	return tile_from_terrain(key[0], key[1], key[2], key[3])
 
 
 ## takes a real tile map position and returns 4 corresponding dual tile map positions
@@ -172,6 +162,7 @@ func pos_to_dual(pos: Vector2i) -> Array[Vector2i]:
 		pos - Vector2i(0, 0), # bottom right
 	]
 
+
 ## takes a dual tile map position and returns 4 corresponding real tile map positions
 func dual_to_pos(dual_pos: Vector2i) -> Array[Vector2i]:
 	# Note: dual_pos is top left in the real tile map
@@ -183,7 +174,11 @@ func dual_to_pos(dual_pos: Vector2i) -> Array[Vector2i]:
 	]
 
 
-## will generate terrain_to_tile based on the tile set terrains
+func tile_from_terrain(top_left: int, top_right: int, bottom_left: int, bottom_right: int) -> Vector2i:
+	return _terrain_to_tile[encode_key([top_left, top_right, bottom_left, bottom_right])]
+
+
+## will generate _terrain_to_tile based on the tile set terrains
 func _generate_terrain_to_tile() -> void:
 	var tile_set_source: TileSetSource = tile_set.get_source(tile_set_index)
 	if tile_set_source is not TileSetAtlasSource:
@@ -203,7 +198,8 @@ func _generate_terrain_to_tile() -> void:
 				continue
 
 			var key: Array[int] = tile_data_to_terrain_key(tile_data)
-			terrain_to_tile[key] = Vector2i(x, y)
+			_terrain_to_tile[encode_key(key)] = Vector2i(x, y)
+
 
 func tile_data_to_terrain_key(tile_data: TileData) -> Array[int]:
 	# you can also check if the cell neighbor is valid using tile_data.is_valid_terrain_peering_bit(...)
@@ -214,3 +210,16 @@ func tile_data_to_terrain_key(tile_data: TileData) -> Array[int]:
 		tile_data.get_terrain_peering_bit(TileSet.CellNeighbor.CELL_NEIGHBOR_BOTTOM_RIGHT_CORNER),
 	]
 	return key
+
+
+## encode the [param key] into a single [code]int[/code] [br]
+## every number in [param key] should be from -1 to 254
+## returned value is [code]u32[/code] integer (0 to 4294967295)
+static func encode_key(key: Array[int]) -> int:
+	var encoded: int = 0
+	for i in key.size():
+		# make n a valid u8, by adding 1 (-1..=254 -> 0..=255)
+		var n = key[i] + 1
+		assert(n >= 0 and n <= 255)
+		encoded |= n << (i * 8)
+	return encoded

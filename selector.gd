@@ -44,13 +44,14 @@ func _process(_delta: float) -> void:
 
 	if Input.is_action_pressed(&"add_tile"):
 		for grid_pos in selected_tiles():
-			dual_tile_map.add_tile(grid_pos, dual_tile_map.Tile.GRASS)
+			# dual_tile_map.add_tile(grid_pos, 0)
+			dual_tile_map.add_tile(grid_pos, 2)
 	
 
 	if Input.is_action_pressed(&"remove_tile"):
 		for grid_pos in selected_tiles():
 			if keep_empty:
-				dual_tile_map.add_tile(grid_pos, dual_tile_map.Tile.EMPTY)
+				dual_tile_map.add_tile(grid_pos, -1)
 			else:
 				dual_tile_map.remove_tile(grid_pos)
 
