@@ -10,8 +10,8 @@ var rect_start: Vector2i
 @export var keep_empty := false
 
 # @export var tilemap: TileMapLayer
-# @export var dual_tile_map: DualTileMapLayer
-@export var dual_tile_map: DualTileMapTool
+@export var dual_tile_map: DualTileMapLayer
+# @export var dual_tile_map: DualTileMapTool
 
 
 func _ready() -> void:
