@@ -1,28 +1,12 @@
-[gd_scene format=4 uid="uid://cgn51rsbnfdl6"]
+[gd_scene format=3 uid="uid://cgn51rsbnfdl6"]
 
 [ext_resource type="Script" uid="uid://cuc0joc44qcdu" path="res://selector.gd" id="4_1bvp3"]
-[ext_resource type="TileSet" uid="uid://ygqnqxlqhf3q" path="res://dual_tile_set.tres" id="4_7mycd"]
-[ext_resource type="Script" uid="uid://c7slw27jttoyw" path="res://dual_tile_map_layer.gd" id="4_lquwl"]
-[ext_resource type="Script" uid="uid://u1t1dujo2gry" path="res://dual_tile_map_tool.gd" id="5_lquwl"]
 
 [node name="Main" type="Node2D" unique_id=573929827]
 
 [node name="Camera2D" type="Camera2D" parent="." unique_id=749953210]
 zoom = Vector2(4, 4)
 
-[node name="DualTileMapTool" type="TileMapLayer" parent="." unique_id=1220817785]
-tile_map_data = PackedByteArray("AAD5//3/AAACAAEAAAD5//7/AAACAAEAAAD5////AAACAAEAAAD6//3/AAAEAAMAAAD6//7/AAAEAAMAAAD6////AAACAAEAAAD7//3/AAAEAAMAAAD7//7/AAAEAAMAAAD7////AAACAAEAAAD8//3/AAACAAEAAAD8//7/AAACAAEAAAD8////AAACAAEAAAD5//z/AAACAAEAAAD6//z/AAACAAEAAAD7//z/AAACAAEAAAD8//z/AAACAAEAAAA=")
-tile_set = ExtResource("4_7mycd")
-script = ExtResource("5_lquwl")
-metadata/_custom_type_script = "uid://u1t1dujo2gry"
-
-[node name="DualTileMapLayer" type="TileMapLayer" parent="." unique_id=1424761694]
-position = Vector2(8, 8)
-tile_set = ExtResource("4_7mycd")
-script = ExtResource("4_lquwl")
-metadata/_custom_type_script = "uid://c7slw27jttoyw"
-
-[node name="Selector" type="Node2D" parent="." unique_id=280302244 node_paths=PackedStringArray("dual_tile_map")]
+[node name="Selector" type="Node2D" parent="." unique_id=280302244]
 script = ExtResource("4_1bvp3")
 keep_empty = true
-dual_tile_map = NodePath("../DualTileMapLayer")

@@ -4,10 +4,11 @@ class_name DualTileMapLayer extends TileMapLayer
 const EMPTY := -1
 
 
-## The tile map
-## key: Vector2i tile position
-## value: tile ID
-var tile_map: Dictionary[Vector2i, int] = {}
+## The tile map data
+## You can leave this empty, or assign a [DualTileMapData]
+## If you assign a [DualTileMapData], then you could save and load it as [code].tres[/code] file (or [code].res[/code]) [br]
+## Note: changing [member data] will NOT immediately update the tile map, if you need to update the tile map, use [method update_every_tile]
+@export var data: DualTileMapData = DualTileMapData.new()
 
 
 ## map that maps encoded 4 int to atlas tile position (Vector2i)
@@ -25,25 +26,27 @@ var terrain_set := 0
 func _ready() -> void:
 	_generate_terrain_to_tile()
 
+	# when the tile_set changes, update the terrain_to_tile
+	tile_set.changed.connect(_on_tile_set_changed)
 	update_every_tile()
 
 
 func update_every_tile() -> void:
 	clear()
-	for pos in tile_map:
-		add_tile(pos, tile_map[pos])
+	for pos in data.tile_map:
+		add_tile(pos, data.tile_map[pos])
 
 
-## removes every tile from the [member tile_map], and rendered tiles
+## removes every tile from the [member data], and rendered tiles
 func clear_all() -> void:
-	tile_map.clear()
+	data.tile_map.clear()
 	clear()
 
 
 ## add a tile at [param pos]
 ## [param tile] is the tile ID to add
 func add_tile(pos: Vector2i, tile: int) -> void:
-	tile_map[pos] = tile
+	data.tile_map[pos] = tile
 
 	for dual_pos in pos_to_dual(pos):
 		format_tile(dual_pos)
@@ -51,12 +54,12 @@ func add_tile(pos: Vector2i, tile: int) -> void:
 
 ## remove the tile at [param pos]
 func remove_tile(pos: Vector2i) -> void:
-	tile_map.erase(pos)
+	data.tile_map.erase(pos)
 
 	# update the 4 corresponding dual tile map cells
 	for dual_pos in pos_to_dual(pos):
 		# if this dual tile is used by any other real tile, just update the dual tile
-		if dual_to_pos(dual_pos).any(func(p): return p in tile_map):
+		if dual_to_pos(dual_pos).any(func(p): return p in data.tile_map):
 			format_tile(dual_pos)
 		# if no real tile relies on this dual tile, remove it
 		else:
@@ -75,7 +78,7 @@ func get_formatted_tile(dual_pos: Vector2i) -> Vector2i:
 	# pos is in dual tile map, i format it based on 4 REAL tiles around it (so not dual grid tiles)
 	# so i kind of format it based on the tiles around it in different dimension
 	for pos in dual_to_pos(dual_pos):
-		key.append(tile_map.get(pos, EMPTY))
+		key.append(data.tile_map.get(pos, EMPTY))
 	
 	return tile_from_terrain(key)
 
@@ -111,6 +114,8 @@ func tile_from_terrain(key: Array[int]) -> Vector2i:
 
 ## will generate _terrain_to_tile based on the tile set terrains
 func _generate_terrain_to_tile() -> void:
+	_terrain_to_tile.clear()
+
 	var tile_set_source: TileSetSource = tile_set.get_source(source_id)
 	if tile_set_source is not TileSetAtlasSource:
 		push_error("Only TileSetAtlasSource is supported")
@@ -130,6 +135,12 @@ func _generate_terrain_to_tile() -> void:
 
 			var key: Array[int] = tile_data_to_terrain_key(tile_data)
 			_terrain_to_tile[encode_key(key)] = Vector2i(x, y)
+
+
+## called when [member tile_set] changes
+func _on_tile_set_changed() -> void:
+	_generate_terrain_to_tile()
+	update_every_tile()
 
 
 ## takes a [param tile_data] and returns the 4 terrain peering bits
@@ -175,14 +186,3 @@ static func encode_key(key: Array[int]) -> int:
 		assert(0 <= n and n <= 255)
 		encoded |= n << (i * 8)
 	return encoded
-
-# ## encode the 4 terrain IDs into a single [code]int[/code] [br]
-# ## every terrain ID should be from -1 to 254
-# ## returned value is [code]u32[/code] integer (0 to 4294967295)
-# static func encode_key(top_left: int, top_right: int, bottom_left: int, bottom_right: int) -> int:
-# 	return (
-# 		(top_left + 1)
-# 		| (top_right + 1) << 8
-# 		| (bottom_left + 1) << 16
-# 		| (bottom_right + 1) << 24
-# 	)
