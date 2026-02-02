@@ -1,12 +1,36 @@
-[gd_scene format=3 uid="uid://cgn51rsbnfdl6"]
+[gd_scene format=4 uid="uid://cgn51rsbnfdl6"]
 
 [ext_resource type="Script" uid="uid://cuc0joc44qcdu" path="res://selector.gd" id="4_1bvp3"]
+[ext_resource type="TileSet" uid="uid://ygqnqxlqhf3q" path="res://dual_tile_set.tres" id="4_7mycd"]
+[ext_resource type="Script" uid="uid://t5x3v33quqou" path="res://dual_tile_map_data.gd" id="4_lquwl"]
+[ext_resource type="Script" uid="uid://c7slw27jttoyw" path="res://dual_tile_map_layer.gd" id="5_7mycd"]
+[ext_resource type="Script" uid="uid://u1t1dujo2gry" path="res://dual_tile_map_tool.gd" id="5_lquwl"]
+
+[sub_resource type="Resource" id="Resource_1bvp3"]
+script = ExtResource("4_lquwl")
+tile_map_data = PackedByteArray("GwAFAAYAAAACAAAACQAAAAYAAAD7/////////wIAAAAAAAAABgAAAPz/////////AgAAAAAAAAAGAAAA/f////////8CAAAAAAAAAAYAAAD+/////////wIAAAAAAAAABgAAAP//////////AgAAAAAAAAAGAAAAAAAAAP////8CAAAAAAAAAAYAAAABAAAA/////wIAAAAAAAAABgAAAAIAAAD/////AgAAAAAAAAAGAAAAAwAAAP////8CAAAAAAAAAA==")
+metadata/_custom_type_script = "uid://t5x3v33quqou"
 
 [node name="Main" type="Node2D" unique_id=573929827]
 
 [node name="Camera2D" type="Camera2D" parent="." unique_id=749953210]
 zoom = Vector2(4, 4)
 
-[node name="Selector" type="Node2D" parent="." unique_id=280302244]
+[node name="DualTileMapTool" type="TileMapLayer" parent="." unique_id=755868233]
+tile_map_data = PackedByteArray("AAD7////AAACAAEAAAD8////AAACAAEAAAD9////AAACAAEAAAD+////AAACAAEAAAD/////AAACAAEAAAAAAP//AAACAAEAAAABAP//AAACAAEAAAACAP//AAACAAEAAAADAP//AAACAAEAAAA=")
+tile_set = ExtResource("4_7mycd")
+script = ExtResource("5_lquwl")
+data = SubResource("Resource_1bvp3")
+metadata/_custom_type_script = "uid://u1t1dujo2gry"
+
+[node name="DualTileMapLayer" type="TileMapLayer" parent="." unique_id=992781071]
+position = Vector2(8, 8)
+tile_set = ExtResource("4_7mycd")
+script = ExtResource("5_7mycd")
+data = SubResource("Resource_1bvp3")
+metadata/_custom_type_script = "uid://c7slw27jttoyw"
+
+[node name="Selector" type="Node2D" parent="." unique_id=280302244 node_paths=PackedStringArray("dual_tile_map")]
 script = ExtResource("4_1bvp3")
 keep_empty = true
+dual_tile_map = NodePath("../DualTileMapLayer")
