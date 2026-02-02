@@ -5,6 +5,7 @@
 [ext_resource type="Script" uid="uid://t5x3v33quqou" path="res://dual_tile_map_data.gd" id="4_lquwl"]
 [ext_resource type="Script" uid="uid://c7slw27jttoyw" path="res://dual_tile_map_layer.gd" id="5_7mycd"]
 [ext_resource type="Script" uid="uid://u1t1dujo2gry" path="res://dual_tile_map_tool.gd" id="5_lquwl"]
+[ext_resource type="Script" uid="uid://nmdguq5yelx" path="res://save_or_load.gd" id="6_7mycd"]
 
 [sub_resource type="Resource" id="Resource_1bvp3"]
 script = ExtResource("4_lquwl")
@@ -34,3 +35,24 @@ metadata/_custom_type_script = "uid://c7slw27jttoyw"
 script = ExtResource("4_1bvp3")
 keep_empty = true
 dual_tile_map = NodePath("../DualTileMapLayer")
+
+[node name="SaveOrLoad" type="VBoxContainer" parent="." unique_id=1982915634 node_paths=PackedStringArray("dual_tile_map")]
+offset_left = -144.0
+offset_top = -80.0
+offset_right = -98.0
+offset_bottom = -14.0
+scale = Vector2(0.5, 0.5)
+script = ExtResource("6_7mycd")
+dual_tile_map = NodePath("../DualTileMapLayer")
+save_path = "res://saves/save.tres"
+
+[node name="SaveButton" type="Button" parent="SaveOrLoad" unique_id=916705100]
+layout_mode = 2
+text = "Save"
+
+[node name="LoadButton" type="Button" parent="SaveOrLoad" unique_id=51528821]
+layout_mode = 2
+text = "Load"
+
+[connection signal="pressed" from="SaveOrLoad/SaveButton" to="SaveOrLoad" method="save_data"]
+[connection signal="pressed" from="SaveOrLoad/LoadButton" to="SaveOrLoad" method="load_data"]

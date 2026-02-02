@@ -3,7 +3,7 @@ class_name DualTileMapTool extends TileMapLayer
 
 
 # TODO: use tile_map_data to check if the tilemap has changed, and only then update
-# TODO: use TileMap.changed signal to update
+# TODO: use TileMap.changed signal to update <-- Note: it doesn't work
 
 
 const EMPTY := -1
@@ -36,17 +36,6 @@ const EMPTY := -1
 			_dual_tile_map_layer.data = data
 
 
-# @export_tool_button("Generate DualTileMapLayer", "TileMapLayer") var generate_tile_map = func():
-# 	# var generated: DualTileMapLayer = _dual_tile_map_layer.duplicate()
-# 	var generated := DualTileMapLayer.new()
-# 	generated.tile_set = _dual_tile_map_layer.tile_set.duplicate(true)
-# 	generated.position = _dual_tile_map_layer.position
-# 	# generated.data = _dual_tile_map_layer.data.duplicate(true)
-# 	generated.data = _dual_tile_map_layer.data
-# 	generated.name = "DualTileMapLayer"
-# 	add_child(generated, true)
-# 	generated.owner = get_tree().edited_scene_root
-
 var _dual_tile_map_layer: DualTileMapLayer
 
 var _update_timer := 0.0
@@ -57,7 +46,6 @@ func _ready() -> void:
 		queue_free()
 		return
 
-	# changed.connect(print.bind(["changed", self ]))
 
 	if data == null:
 		push_warning("%s: data is null, please assign it and restart the scene" % name)
