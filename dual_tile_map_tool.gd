@@ -2,10 +2,6 @@
 class_name DualTileMapTool extends TileMapLayer
 
 
-# TODO: use tile_map_data to check if the tilemap has changed, and only then update
-# TODO: use TileMap.changed signal to update <-- Note: it doesn't work
-
-
 const EMPTY := -1
 
 ## how often this should update when in the editor
@@ -40,12 +36,13 @@ var _dual_tile_map_layer: DualTileMapLayer
 
 var _update_timer := 0.0
 
+var _old_tile_data: PackedByteArray
+
 
 func _ready() -> void:
 	if not Engine.is_editor_hint():
 		queue_free()
 		return
-
 
 	if data == null:
 		push_warning("%s: data is null, please assign it and restart the scene" % name)
@@ -69,7 +66,9 @@ func _process(delta: float) -> void:
 		_update_timer += delta
 		if _update_timer > update_interval:
 			_update_timer = 0.0
-			update()
+			if _old_tile_data != tile_map_data:
+				_old_tile_data = tile_map_data.duplicate()
+				update()
 
 
 func update() -> void:
