@@ -44,7 +44,7 @@ offset_bottom = -14.0
 scale = Vector2(0.5, 0.5)
 script = ExtResource("6_7mycd")
 dual_tile_map = NodePath("../DualTileMapLayer")
-save_path = "res://saves/save.tres"
+save_path = "res://saves/save.bin"
 
 [node name="SaveButton" type="Button" parent="SaveOrLoad" unique_id=916705100]
 layout_mode = 2
