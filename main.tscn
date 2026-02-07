@@ -9,7 +9,7 @@
 
 [sub_resource type="Resource" id="Resource_1bvp3"]
 script = ExtResource("4_lquwl")
-tile_map_data = PackedByteArray("GwAFAAYAAAACAAAACAAAAAYAAAD7/////////wIAAAAAAAAABgAAAPz/////////AgAAAAAAAAAGAAAA/f////////8CAAAAAAAAAAYAAAD//////////wIAAAAAAAAABgAAAAAAAAD/////AgAAAAAAAAAGAAAAAQAAAP////8CAAAAAAAAAAYAAAACAAAA/////wIAAAAAAAAABgAAAAMAAAD/////AgAAAAAAAAA=")
+tile_map_data = PackedByteArray("+////wH8////Af3///8B/////wEAAP//AQEA//8BAgD//wEDAP//Af7///8BBAD//wE=")
 metadata/_custom_type_script = "uid://t5x3v33quqou"
 
 [node name="Main" type="Node2D" unique_id=573929827]
@@ -18,9 +18,10 @@ metadata/_custom_type_script = "uid://t5x3v33quqou"
 zoom = Vector2(4, 4)
 
 [node name="DualTileMapTool" type="TileMapLayer" parent="." unique_id=755868233]
-tile_map_data = PackedByteArray("AAD7////AAACAAEAAAD8////AAACAAEAAAD9////AAACAAEAAAD/////AAACAAEAAAAAAP//AAACAAEAAAABAP//AAACAAEAAAACAP//AAACAAEAAAADAP//AAACAAEAAAA=")
+tile_map_data = PackedByteArray("AAD7////AAACAAEAAAD8////AAACAAEAAAD9////AAACAAEAAAD/////AAACAAEAAAAAAP//AAACAAEAAAABAP//AAACAAEAAAACAP//AAACAAEAAAADAP//AAACAAEAAAD+////AAACAAEAAAAEAP//AAACAAEAAAA=")
 tile_set = ExtResource("4_7mycd")
 script = ExtResource("5_lquwl")
+update_interval = 0.0
 data = SubResource("Resource_1bvp3")
 metadata/_custom_type_script = "uid://u1t1dujo2gry"
 
