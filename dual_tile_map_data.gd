@@ -47,13 +47,10 @@ func keys() -> Array[Vector2i]:
 	return tile_map.keys()
 
 
-## This will return a compressed tile map bytes
-## it is pretty slow (because of compression), so it is recommended to use only use when saving to a file
+## This will return a [code]PackedByteArray[/code] of all the tiles
 func to_bytes() -> PackedByteArray:
 	# it stores stuff like this:
 	# [u16 pos.x, u16 pos.y, u8 tile_id, ...]
-	# then compressed using ZSTD
-	# then last 4 bytes is the size of uncompressed bytes (original size)
 	var bytes = PackedByteArray()
 	var i = 0
 	bytes.resize(tile_map.size() * 5)
@@ -66,21 +63,10 @@ func to_bytes() -> PackedByteArray:
 		bytes.encode_u8(i, tile_map[pos] + 1)  # make -1 a valid u8
 		i += 1
 
-	# Z standard compression, it results in the smallest size, but slow
-	# the default (FASTLZ) is fast, but does not compress that well
-	var compressed = bytes.compress(FileAccess.COMPRESSION_ZSTD)
-	compressed.resize(compressed.size() + 4)
-	# append the real size of uncompressed bytes at the end, so i can easily remove it later
-	compressed.encode_u32(compressed.size() - 4, bytes.size())
-	return compressed
+	return bytes
 
 
-func from_bytes(compressed_bytes: PackedByteArray) -> void:
-	# get the original size
-	var size = compressed_bytes.decode_u32(compressed_bytes.size() - 4)
-	# remove last 4 bytes that represented the size (now everything is just valid compressed bytes)
-	compressed_bytes.resize(compressed_bytes.size() - 4)
-	var bytes = compressed_bytes.decompress(size, FileAccess.COMPRESSION_ZSTD)
+func from_bytes(bytes: PackedByteArray) -> void:
 	tile_map = {}
 	var i = 0
 	while i < bytes.size():
